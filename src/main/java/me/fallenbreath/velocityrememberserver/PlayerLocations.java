@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -21,11 +22,13 @@ public class PlayerLocations
 
 	private final Logger logger;
 	private final Path locationFilePath;
+	private final Path locationTempFilePath;
 
 	public PlayerLocations(Logger logger, Path locationFilePath)
 	{
 		this.logger = logger;
 		this.locationFilePath = locationFilePath;
+		this.locationTempFilePath = locationFilePath.resolveSibling(locationFilePath.getFileName().toString() + ".tmp");
 	}
 
 	public void load()
@@ -74,7 +77,8 @@ public class PlayerLocations
 			DumperOptions dumperOptions = new DumperOptions();
 			dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
 			String yamlContent = new Yaml(dumperOptions).dump(this.locations);
-			Files.writeString(this.locationFilePath, yamlContent, StandardCharsets.UTF_8);
+			Files.writeString(this.locationTempFilePath, yamlContent, StandardCharsets.UTF_8);
+			Files.move(this.locationTempFilePath, this.locationFilePath, StandardCopyOption.REPLACE_EXISTING);
 		}
 		catch (Exception e)
 		{
