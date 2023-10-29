@@ -44,7 +44,7 @@ public class PlayerLocations
 				{
 					throw new IOException(String.format("Create directory %s failed", dir));
 				}
-				Files.writeString(this.locationFilePath, "locations: {}");
+				Files.writeString(this.locationFilePath, "");
 			}
 			catch (IOException e)
 			{
@@ -56,13 +56,16 @@ public class PlayerLocations
 		try
 		{
 			String yamlContent = Files.readString(this.locationFilePath);
-			var locations = new Yaml().loadAs(yamlContent, Map.class).get("locations");
-			((Map<?, ?>)locations).forEach((k, v) -> {
-				if (k instanceof String && v instanceof String)
-				{
-					this.locations.put(k.toString(), v.toString());
-				}
-			});
+			var locations = new Yaml().loadAs(yamlContent, Map.class);
+			if (locations != null)
+			{
+				((Map<?, ?>)locations).forEach((k, v) -> {
+					if (k instanceof String && v instanceof String)
+					{
+						this.locations.put(k.toString(), v.toString());
+					}
+				});
+			}
 		}
 		catch (Exception e)
 		{
